@@ -1,1 +1,3 @@
 # Detailed requirement for SBC design assessment automation
+1. After trainee's work assignment submission, assessment will be implemented by the automation tool
+2. The automation tool should check every items in SBC design assignment document.
