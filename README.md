@@ -1,2 +1,2 @@
 # KMCD-Assessment-Automation
-Repo for SBC certificates exam assignment assessment automation
+KMCD would like to make work assignment assessment to be automatic. This repo is created for the automation tool.
