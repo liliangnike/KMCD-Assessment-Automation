@@ -1,1 +1,11 @@
 # Design for automation tool
+- Input:
+  1) Signaling artifact zip file
+  2) Media artifact zip file
+  
+- Output:
+  1) Pass
+  2) Fail
+  
+- Error code:
+  1) SCRIPT_RUN_ERROR
