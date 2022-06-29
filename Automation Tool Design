@@ -1,11 +1,16 @@
 # Design for automation tool
 - Input:
-  1) Signaling artifact zip file
-  2) Media artifact zip file
+  1) Signaling artifacts zip file
+  2) Media artifacts zip file
+  3) SBC release
   
 - Output:
   1) Pass
   2) Fail
   
-- Error code:
+- Error code: (keep updating during coding phase)
   1) SCRIPT_RUN_ERROR
+
+
+- Check & Validation
+  
