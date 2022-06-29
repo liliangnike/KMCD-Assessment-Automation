@@ -58,6 +58,14 @@ def parse_validate_opts():
 #################################################################################
 def main():
         parse_validate_opts()
+        signaling_actifacts_process()
+        media_artifacts_process()
+        network_validation()
+        domain_validation()
+        interconnection_validation()
+        sbc_feature_validation()
+        timezone_ntp_validation()
+        openstack_cloud_validation()
   
 if __name__ == '__main__':
         main()
