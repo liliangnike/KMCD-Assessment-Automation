@@ -115,26 +115,18 @@ function parse_opts
 				printf "${EXAMPLES}"
 				exit 0
 				;;
-			-c|--central_ms_repo)
+			-s|--signaling-artifacts)
 				central_ms_repo="${2}"
 				shift 2
 				;;
-			-m|--local_ms_repo)
+			-m|--media-artifacts)
 				local_ms_repo="${2}"
 				shift 2
 				;;
-			-l|--central_fdt_repo)
+			-r|--sbc-release)
 				central_fdt_repo="${2}"
 				shift 2
-				;;
-			-t|--local_fdt_repo)
-				local_fdt_repo="${2}"
-				shift 2
 				;;	
-                        -f|--fr)
-                                FR_to_rebase="${2}"
-                                shift 2
-                                ;;
 			--)
 				shift;
 				break;
@@ -149,165 +141,6 @@ function parse_opts
     return ${val}
 }
 
-function get_ms_par_changeset
-{
-    typeset -i ret_val=0
-    typeset par_cmd_result=""
-    typeset par_debug_cmd_result=""
-
-    if [[ ! -d "${local_ms_repo}" ]]; then
-        printf "File ${local_ms_repo} does not exist." >&2 
-        ret_val=${REPO_DIR_NOT_EXIST}
-    else
-        clean_to_sync_repo ${local_ms_repo}
-
-        par_cmd_result=$(${HG_PAR})
-        printf "${par_cmd_result}\n\n"
-        ms_par_changeset=$(get_par_changeset "${par_cmd_result}")
-        ret_val=${?}
-
-        par_debug_cmd_result=$(${HG_PAR_DEBUG})
-        printf "${par_debug_cmd_result}\n"
-        ms_par_changeset_debug=$(get_par_changeset "${par_debug_cmd_result}")
-        ret_val=${?}
-    fi
-    
-    return ${ret_val}
-}
-
-function clean_to_sync_repo
-{
-    typeset -i ret_val=0
-    typeset repo=${1}
-
-    if [[ ! -d "${repo}" ]]; then
-        printf "Repo directory ${repo} does not exist." >&2
-        ret_val=${REPO_DIR_NOT_EXIST}
-    else 
-        cd ${repo}
-        printf "\nEnter into ${repo} to clean...\n\n"
-		
-        ${PURGE}
-        ret_val=${?}
-        if (( ${ret_val} != 0 )); then
-            printf "Failed to execute command ${PURGE}.\n" >&2
-            exit ${HG_PURGE_FAIL}
-        fi
-        printf "${repo} has been purged.\n\n"
-		
-        ${UPDATE_CLEAN}
-        ret_val=${?}
-        if (( ${ret_val} != 0 )); then
-            printf "Failed to execute command ${UPDATE_CLEAN}.\n" >&2
-            exit ${HG_UPDATE_CLEAN_FAIL}
-        fi
-        printf "${repo} has been updated and cleaned\n\n"
-		
-        # If no code update, "hg pull -u" returns 1.
-        ${PULL_UPDATE}
-
-    fi 
-
-    return ${ret_val}
-}
-
-function get_par_changeset
-{
-    typeset -i ret_val=0
-    typeset hg_par_cmd_result=${1}
-    typeset par_changeset=""
-
-    par_changeset=$(echo ${hg_par_cmd_result} | cut -d ":" -f 3 | cut -d " " -f 1)
-    ret_val=${?}
-
-    printf "${par_changeset}"
-
-    return ${ret_val}
-}
-
-function get_fdt_par_changeset
-{
-    typeset -i ret_val=0
-    typeset par_debug_cmd_result=""
-
-    if [[ ! -d "${local_fdt_repo}" ]]; then
-        printf "File ${local_fdt_repo} does not exist." >&2
-        ret_val=${REPO_DIR_NOT_EXIST}
-    else
-        clean_to_sync_repo ${local_fdt_repo}
-
-        par_debug_cmd_result=$(${HG_PAR_DEBUG})
-        printf "${par_debug_cmd_result}\n"
-        fdt_par_changeset_debug=$(get_par_changeset "${par_debug_cmd_result}")
-        ret_val=${?}
-    fi
-
-    return ${ret_val}
-}
-
-function do_rebase
-{
-    typeset -i ret_val=0
-    typeset unresolve_txt="${local_fdt_repo}/unresolve.txt"
-	
-    ${HG_REBASE} -f ${central_ms_repo} ${ms_par_changeset_debug} -t ${central_fdt_repo} ${fdt_par_changeset_debug}
-
-    # check unresolve.txt under FDT repo
-    if  [[ -f "${unresolve_txt}" ]]; then
-        wait_user_to_resolve_confict ${unresolve_txt}
-        exit ${UNRESOLVED_CONFLICT}
-    fi
-	
-    return ${ret_val}
-}
-
-function wait_user_to_resolve_confict
-{
-    # to do later
-    print ${1}
-}
-
-function check_in_fdt_changes
-{
-    cd ${local_fdt_repo}
-    ${HG_CI} -u ${USER} -m "FR ${FR_to_rebase}: rebase with MS changset ${ms_par_changeset}"
-    # notice below case
-    # [leonll@AONT24 HD_R5701_FDT1480]$ hg ci -u leonll -m 'FR ALU02375967: rebase with MS changset 27fe2e5aa327'
-    # nothing changed
-
-}
-
-function send_post_review
-{
-    typeset outgoing_changsets=""
-    typeset post_review_cs=""
-
-    cd ${local_fdt_repo}
-    outgoing_changsets=$(${HG_OUTGOING})
-    post_review_cs=$(echo "${outgoing_changsets}" | grep "changeset:" | cut -d ':' -f 3 | tail -n 1)
-
-    printf "Changeset for sending code review is ${post_review_cs}.\n"
-    ${POST_REVIEW} --revision-range=${post_review_cs} --target-people=${USER}
-
-} 
-
-function is_post_review_closed
-{
-    typeset is_shipped=""
-    printf "Type 'y' to push changes; type 'n' to push the changes later:"
-    read is_shipped 
-    if [[ ${is_shipped} == ['y''Y'] ]]; then
-	cd ${local_fdt_repo}
-        ${HG_PUSH}       
-    elif [[ ${is_shipped} == ['n''N'] ]]; then
-	printf "User selected not to push changes. Please remember to push the rebased changesets later."	
-    else
-	printf "Invalid input, exit rebase. Please remember to push the rebased changesets later."
-        exit ${INVALID_INPUT_OPTION}
-    fi
-
-}
-
 #############################################################
 #    			Main Function
 #############################################################
@@ -315,22 +148,23 @@ parse_opts "$@"
 
 typeset ret_val=-1
 
-get_ms_par_changeset
+signaling_actifacts_process
 ret_val=${?}
 
-get_fdt_par_changeset
+media_artifacts_process
 ret_val=${?}
 
-do_rebase
+network_validation
 ret_val=${?}
 
-check_in_fdt_changes 
+domain_validation 
 
-send_post_review
+interconnection_validation
 
-is_post_review_closed
+sbc_feature_validation
 
-#do_pullme
+timezone_ntp_validation
 
+openstack_cloud_validation
 
 exit ${ret_val}
