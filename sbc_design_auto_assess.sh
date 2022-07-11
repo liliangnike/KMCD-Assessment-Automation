@@ -26,37 +26,15 @@ UNRESOLVED_CONFLICT=9
 
 # Global Variables
 typeset ms_par_changeset=""
-typeset ms_par_changeset_debug=""
-typeset fdt_par_changeset_debug=""
-
-typeset central_ms_repo=""
-typeset local_ms_repo=""
-typeset central_fdt_repo=""
-typeset local_fdt_repo=""
-
-typeset FR_to_rebase=""
 
 # Global commands set
 typeset PURGE="/usr/local/bin/hg purge"
-typeset UPDATE_CLEAN="/usr/local/bin/hg update --clean"
-typeset PULL_UPDATE="/usr/local/bin/hg pull -u"
-typeset HG_PAR="/usr/local/bin/hg par"
-typeset HG_PAR_DEBUG="/usr/local/bin/hg par --debug"
-typeset HG_CI="/usr/local/bin/hg ci"
-typeset HG_OUTGOING="/usr/local/bin/hg outgoing"
-typeset HG_PUSH="/usr/local/bin/hg push"
-
-typeset HG_REBASE="/home/buildmgr/bin/HG_brebase.sh"
-typeset POST_REVIEW="/usr/bin/post-review"
-
-typeset SHIP_REVIEW="~/bin/ship"
 
 
 GENERAL_USAGE="USAGE:
 ${THIS} < --help | --examples >
   or
-${THIS} --central_ms_repo <central MS repo> --local_ms_repo <local MS repo>\n\
- \n--central_fdt_repo <central FDT repo> --local_fdt_repo <local FDT repo> --fr <FR used to do rebase>\n"
+${THIS} --signaling-artifacts <Signaling Artifacts Zip file> --media-artifacts <Media Artifacts Zip file> --release <SBC Release>"
 
 EXTENDED_USAGE="${GENERAL_USAGE}
 
@@ -66,23 +44,18 @@ Where,
 
 --examples - shows some example usages.
 
---central_ms_repo - MS repo directory in central code repository server
+--signaling-artifacts - Signaling Artifacts Zip file
 
---local_ms_repo - MS repo directory of local user
+--media-artifacts - Media Artifacts Zip file
 
---central_fdt_repo - FDT repo directory in central code repository server
-
---local_fdt_repo - FDT repo directory of local user
-
---fr - FR number used to do rebase
+--release - SBC Release
 
 "
 
 EXAMPLES="
 EXAMPLES:
 
-${THIS} --central_ms_repo ssh://hg@135.251.206.233/HD_R5601 --local_ms_repo /repo/leonll/HD_R5601\
-\n --central_fdt_repo ssh://hg@135.251.206.233/HD_R5601_FDT1480 --local_fdt_repo /repo/leonll/HD_R5601_FDT1480 --fr ALU02375967
+${THIS} --signaling-artifacts /tmp/SBC-signaling_R21.8MP2110 --media-artifacts /tmp/nokia.vMGW_C218_M_O_av100043.OpenStack_CBAM.B02 --release R21.8MP2110
 
 "
 function parse_opts
@@ -123,7 +96,7 @@ function parse_opts
 				local_ms_repo="${2}"
 				shift 2
 				;;
-			-r|--sbc-release)
+			-r|--release)
 				central_fdt_repo="${2}"
 				shift 2
 				;;	
