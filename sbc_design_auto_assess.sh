@@ -27,6 +27,7 @@ typeset MEDIA_UNZIP_TARGET_PATH="/tmp/sbc_design/media"
 # Global commands set
 typeset UNZIP="/usr/bin/unzip"
 typeset MKDIR="/usr/bin/mkdir"
+typeset RM="/usr/bin/rm"
 
 GENERAL_USAGE="USAGE:
 ${THIS} < --help | --examples >
@@ -130,9 +131,16 @@ function media_artifacts_process
     
     ${UNZIP} -d ${MEDIA_UNZIP_TARGET_PATH} ${MEDIA_ARTIFACTS_ZIP}
     
-    return ${val}
+    return ${val}     
 }
 
+function post_process
+{
+    # Once the assessment is finished, delete all artifacts
+    ${RM} -rf ${SIG_UNZIP_TARGET_PATH}
+    
+    ${RM} -rf ${MEDIA_UNZIP_TARGET_PATH}
+}
 #############################################################
 #    			Main Function
 #############################################################
@@ -158,5 +166,7 @@ sbc_feature_validation
 timezone_ntp_validation
 
 openstack_cloud_validation
+
+post_process
 
 exit ${ret_val}
