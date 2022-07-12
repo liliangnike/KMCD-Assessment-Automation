@@ -21,8 +21,8 @@ GETOPT_EXE_ERROR=2
 typeset SIG_ARTIFACTS_ZIP=""
 typeset MEDIA_ARTIFACTS_ZIP=""
 typeset SBC_RELEASE=""
-typeset SIG_UNZIP_TARGET_PATH="/tmp/signaling"
-typeset MEDIA_UNZIP_TARGET_PATH="/tmp/media"
+typeset SIG_UNZIP_TARGET_PATH="/tmp/sbc_design/signaling"
+typeset MEDIA_UNZIP_TARGET_PATH="/tmp/sbc_design/media"
 
 # Global commands set
 typeset UNZIP="/usr/bin/unzip"
@@ -115,9 +115,9 @@ function signaling_actifacts_process
 {
     typeset val=0
     
-    ${MKDIR} -P ${SIG_UNZIP_TARGET_PATH}
+    ${MKDIR} -p ${SIG_UNZIP_TARGET_PATH}
     
-    ${UNZIP} -d ${SIG_UNZIP_TARGET_PATH} SIG_ARTIFACTS_ZIP
+    ${UNZIP} -d ${SIG_UNZIP_TARGET_PATH} ${SIG_ARTIFACTS_ZIP}
     
     return ${val}
 }
@@ -128,7 +128,7 @@ function media_artifacts_process
     
     ${MKDIR} -p ${MEDIA_UNZIP_TARGET_PATH}
     
-    ${UNZIP} -d ${MEDIA_UNZIP_TARGET_PATH} MEDIA_ARTIFACTS_ZIP
+    ${UNZIP} -d ${MEDIA_UNZIP_TARGET_PATH} ${MEDIA_ARTIFACTS_ZIP}
     
     return ${val}
 }
