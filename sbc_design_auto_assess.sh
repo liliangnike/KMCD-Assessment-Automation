@@ -16,19 +16,17 @@ typeset USER=$(whoami)
 
 # Error return value check list
 GETOPT_EXE_ERROR=2
-INVALID_USAGE=3
-REPO_DIR_NOT_EXIST=4
-HG_PURGE_FAIL=5
-HG_UPDATE_CLEAN_FAIL=6
-HG_REBASE_FAIL=7
-INVALID_INPUT_OPTION=8
-UNRESOLVED_CONFLICT=9
 
 # Global Variables
-typeset ms_par_changeset=""
+typeset SIG_ARTIFACTS_ZIP=""
+typeset MEDIA_ARTIFACTS_ZIP=""
+typeset SBC_RELEASE=""
+
 
 # Global commands set
-typeset PURGE="/usr/local/bin/hg purge"
+typeset UNZIP="/usr/bin/unzip"
+typeset SIG_UNZIP_TARGET_PATH="/tmp"
+typeset MEDIA_UNZIP_TARGET_PATH="/tmp"
 
 
 GENERAL_USAGE="USAGE:
@@ -68,7 +66,7 @@ function parse_opts
     fi
     
     # Parse command options by getopt
-    ARGS=$(getopt -o c:m:l:t:f:he -l "central_ms_repo:,local_ms_repo:,central_fdt_repo:,local_fdt_repo:,fr:,help,examples" -n "rebase.bash" -- "$@")
+    ARGS=$(getopt -o s:m:r:he -l "signaling-artifacts:,media-artifacts:,release:,help,examples" -n "rebase.bash" -- "$@")
     val=${?}
 
     if [[ ${val} != 0 ]] ; then
@@ -89,15 +87,15 @@ function parse_opts
 				exit 0
 				;;
 			-s|--signaling-artifacts)
-				central_ms_repo="${2}"
+				SIG_ARTIFACTS_ZIP="${2}"
 				shift 2
 				;;
 			-m|--media-artifacts)
-				local_ms_repo="${2}"
+				MEDIA_ARTIFACTS_ZIP="${2}"
 				shift 2
 				;;
 			-r|--release)
-				central_fdt_repo="${2}"
+				SBC_RELEASE="${2}"
 				shift 2
 				;;	
 			--)
@@ -110,6 +108,24 @@ function parse_opts
 				;;
 	esac
 	done
+    
+    return ${val}
+}
+
+function signaling_actifacts_process
+{
+    typeset val=0
+    
+    ${UNZIP} -d ${SIG_UNZIP_TARGET_PATH} SIG_ARTIFACTS_ZIP
+    
+    return ${val}
+}
+
+function media_artifacts_process
+{
+    typeset val=0
+    
+    ${UNZIP} -d ${MEDIA_UNZIP_TARGET_PATH} MEDIA_ARTIFACTS_ZIP
     
     return ${val}
 }
