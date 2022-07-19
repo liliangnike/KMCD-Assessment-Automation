@@ -14,6 +14,7 @@ import signal
 import optparse
 import exceptions
 import subprocess
+import json
 from subprocess import Popen, PIPE
 from time import gmtime, strftime
 
@@ -29,6 +30,9 @@ sbc_release = ''
 
 signaling_artifact_path = '/tmp/sbc_design/signaling'
 media_artifact_path = '/tmp/sbc_design/media'
+
+sig_artifact_path_after_unzip = signaling_artifact_path[:-4]
+media_artifact_path_after_unzip = media_artifact_path + 'media01'
 
 #################################################################################
 def parse_validate_opts():
@@ -77,6 +81,8 @@ def media_artifact_process():
       run_cmd_with_std_error('/usr/bin/unzip -d ' + signaling_artifact_path + media_artifact)
 
 def load_signaling_artifacts():
+        with open('sig_artifact_path_after_unzip' + '/bulk_adm/LCM_instantiate_params', 'r') as sigaling_file:
+               signaling_data = json.load(sigaling_file)
         
 #################################################################################
 def main():
