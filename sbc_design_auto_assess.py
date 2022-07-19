@@ -81,7 +81,7 @@ def media_artifact_process():
       run_cmd_with_std_error('/usr/bin/unzip -d ' + signaling_artifact_path + media_artifact)
 
 def load_signaling_artifacts():
-        with open('sig_artifact_path_after_unzip' + '/bulk_adm/LCM_instantiate_params', 'r') as sigaling_file:
+        with open('sig_artifact_path_after_unzip' + '/bulk_adm/LCM_instantiate_params.json', 'r') as sigaling_file:
                signaling_data = json.load(sigaling_file)
         
 #################################################################################
