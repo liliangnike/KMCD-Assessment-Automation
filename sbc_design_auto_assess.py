@@ -15,9 +15,9 @@ import optparse
 import exceptions
 import subprocess
 from subprocess import Popen, PIPE
-
-
 from time import gmtime, strftime
+
+from utils import *
 
 this=os.path.basename(sys.argv[0])
 
@@ -27,6 +27,8 @@ sigaling_artifact = ''
 media_artifact = ''
 sbc_release = ''
 
+signaling_artifact_path = '/tmp/sbc_design/signaling'
+media_artifact_path = '/tmp/sbc_design/media'
 
 #################################################################################
 def parse_validate_opts():
@@ -55,14 +57,34 @@ def parse_validate_opts():
         sbc_release = options.sbc_release
 
 #################################################################################
-def signaling_actifact_process():
+def signaling_artifact_process():
+      if os.path.exists(media_artifact_path) == True:
+        # Every new assessment task, we should remove old content
+        run_cmd_with_std_output('/usr/bin/rm -rf ' + media_artifact_path)
+      else:
+        run_cmd_with_std_output('/usr/bin/mkdir -p  ' + media_artifact_path)
         
+      run_cmd_with_std_error('/usr/bin/unzip -d ' + media_artifact_path + sigaling_artifact)
 
+#################################################################################
+def media_artifact_process():
+      if os.path.exists(signaling_artifact_path) == True:
+        # Every new assessment task, we should remove old content
+        run_cmd_with_std_output('/usr/bin/rm -rf ' + signaling_artifact_path)
+      else:
+        run_cmd_with_std_output('/usr/bin/mkdir -p  ' + signaling_artifact_path)
+        
+      run_cmd_with_std_error('/usr/bin/unzip -d ' + signaling_artifact_path + media_artifact)
+
+def load_signaling_artifacts():
+        
 #################################################################################
 def main():
         parse_validate_opts()
-        signaling_actifact_process()
-        media_artifacts_process()
+        signaling_artifact_process()
+        media_artifact_process()
+        load_signaling_artifacts()
+        load_media_artifacts()
         network_validation()
         domain_validation()
         interconnection_validation()
