@@ -22,7 +22,7 @@ DEBUGGING = 3
 DBG_STREAM = sys.stdout	
 
 # Global variables
-assessment_log_file = '/tmp/sbc_design/assess.log'
+assessment_log_file = '/tmp/sbc_design/assessment.log'
 assessment_log_path = '/tmp/sbc_design/'
 
 
@@ -84,11 +84,16 @@ def err_log(msg):
 
 		f = open(assessment_log_file, "a")
 		dt = strftime("%h %d %T ",gmtime())
+		line = dt + ' ERROR: ' + msg + '\n'
 		f.write(line)
 		f.close()
 		
 		# during transition, print to stdout as well, so that log and standard message can coexist. 
 		print  "ERROR: " + msg
+		
+	except Exception, exc:
+		print exc # str(exc) is printed
+		raise Exception, 'err_log() failed'
  
 ################################################################################
 def run_cmd_with_std_error( cmd, err_log_flag = True ):
@@ -127,11 +132,6 @@ def run_cmd_with_ret_code( cmd ):
 	else:
 		return True
   
-		
-	except Exception, exc:
-		print exc # str(exc) is printed
-		raise Exception, 'err_log() failed'
-		
 ################################################################################		
 def debug (level, msg):
 	global DEBUGGING
