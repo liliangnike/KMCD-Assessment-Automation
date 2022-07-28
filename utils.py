@@ -138,3 +138,30 @@ def debug (level, msg):
 	global DBG_STREAM
 	if DEBUGGING < level and DBG_STREAM:
 		DBG_STREAM.write (msg + '\n')	
+
+################################################################################
+def get_ip_offset(ip, base):
+	''' Get offset based on ip base. Assume ip and base in same subnet.'''
+	intip = ip2int(ip)
+	intbase = ip2int(base)
+	offset = intip - (intip & intbase)
+	return offset
+	
+################################################################################
+def ip2int(ip):
+	''' Covert ip string to integer. '''
+	ip_list = []
+	ip_list = ip.split('.')
+	return (int(ip_list[0])<<24) | (int(ip_list[1])<<16) | (int(ip_list[2])<<8) | int(ip_list[3])
+
+def is_last_ip_used_as_gateway(gw_ip, base, mask):
+	mask_offset = get_ip_offset('255.255.255.255', mask)
+	
+	gw_offset = get_ip_offset(gw_ip, base)
+
+	if gw_offset != mask_offset:
+		return False
+	else:
+		return True
+
+	
