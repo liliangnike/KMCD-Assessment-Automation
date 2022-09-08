@@ -123,6 +123,7 @@ def run_cmd_with_std_output( cmd ):
 		raise Exception, output
 	else:
 		return (output, error)
+
 ################################################################################
 def run_cmd_with_ret_code( cmd ):
 	''' Runs a shell command, and returns its exit code. '''
@@ -154,6 +155,7 @@ def ip2int(ip):
 	ip_list = ip.split('.')
 	return (int(ip_list[0])<<24) | (int(ip_list[1])<<16) | (int(ip_list[2])<<8) | int(ip_list[3])
 
+################################################################################
 def is_last_ip_used_as_gateway(gw_ip, base, mask):
 	mask_offset = get_ip_offset('255.255.255.255', mask)
 	
@@ -164,4 +166,3 @@ def is_last_ip_used_as_gateway(gw_ip, base, mask):
 	else:
 		return True
 
-	
